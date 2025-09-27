@@ -1,0 +1,24 @@
+name: Sync to Gitee
+
+on:
+  push:
+    branches: [ main ]  # 触发分支，根据你的默认分支调整（如 master）
+  schedule:
+    - cron: '0 2 * * *'  # 每天 UTC 2:00（北京时间 10:00）自动同步
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Mirror GitHub to Gitee
+      uses: Yikun/hub-mirror-action@master
+      with:
+        src: 'github/Kirito520Asuna'  # 替换为你的 GitHub 用户名或组织名
+        dst: 'gitee/kirito-asuna'    # 替换为你的 Gitee 用户名
+        dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
+        dst_token: ${{ secrets.GITEE_TOKEN }}
+        static_list: 'JetBrains-Activation'       # 替换为仓库名；如果同步多个，用逗号分隔
+        force_update: true                  # 强制覆盖更新
+        timeout: 600s                       # 超时时间
+        debug: true                         # 启用调试日志（可选）
