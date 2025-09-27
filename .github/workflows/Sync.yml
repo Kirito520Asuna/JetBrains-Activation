@@ -2,7 +2,7 @@ name: Sync to Gitee
 
 on:
   push:
-    branches: [ main ]  # 触发分支，根据你的默认分支调整（如 master）
+    branches: [ master ]  # 触发分支，根据你的默认分支调整（如 master）
   schedule:
     - cron: '0 2 * * *'  # 每天 UTC 2:00（北京时间 10:00）自动同步
   workflow_dispatch: # 允许手动触发
