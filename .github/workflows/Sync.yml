@@ -5,20 +5,56 @@ on:
     branches: [ main ]  # 触发分支，根据你的默认分支调整（如 master）
   schedule:
     - cron: '0 2 * * *'  # 每天 UTC 2:00（北京时间 10:00）自动同步
-  workflow_dispatch:  # 允许手动触发
+  workflow_dispatch: # 允许手动触发
+    inputs:
+      repo_name:
+        description: '输入仓库名'
+        required: false
+        type: string
+        default: ${{ github.event.repository.name }}  # 默认使用 GitHub 仓库名
+      gitee_name:
+        description: '输入gitee用户名'
+        required: false
+        type: string
+        default: 'kirito-asuna'
+      github_name:
+        description: '输入github用户名'
+        required: false
+        type: string
+        default: 'Kirito520Asuna'
+      debug:
+        description: '是否开启调试模式'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-    - name: Mirror GitHub to Gitee
-      uses: Yikun/hub-mirror-action@master
-      with:
-        src: 'github/Kirito520Asuna'  # 替换为你的 GitHub 用户名或组织名
-        dst: 'gitee/kirito-asuna'    # 替换为你的 Gitee 用户名
-        dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
-        dst_token: ${{ secrets.GITEE_TOKEN }}
-        static_list: 'JetBrains-Activation'       # 替换为仓库名；如果同步多个，用逗号分隔
-        force_update: true                  # 强制覆盖更新
-        timeout: 600s                       # 超时时间
-        debug: true                         # 启用调试日志（可选）
+
+      - name: 1.设置输入值
+        run: |
+          REPO_NAME=${{ inputs.repo_name ||github.event.repository.name}}
+          DEBUG=${{ inputs.debug||true }}
+          GITEE_NAME=${{ inputs.gitee_name||'kirito-asuna'}}
+          GITHUB_NAME=${{inputs.github_name||'Kirito520Asuna'}}
+          
+          echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
+          echo "DEBUG=$DEBUG" >> $GITHUB_ENV
+          echo "GITEE_NAME=$GITEE_NAME" >> $GITHUB_ENV
+          echo "GITHUB_NAME=$GITHUB_NAME" >> $GITHUB_ENV
+          
+          echo "设置的输入值: REPO_NAME=$REPO_NAME,DEBUG=$DEBUG,GITEE_NAME=$GITEE_NAME,GITHUB_NAME=$GITHUB_NAME"
+
+      - name: 2.Mirror GitHub to Gitee
+        uses: Yikun/hub-mirror-action@master
+        with:
+          src: 'github/${{env.GITHUB_NAME}}'  # 替换为你的 GitHub 用户名或组织名
+          dst: 'gitee/${{env.GITEE_NAME}}'    # 替换为你的 Gitee 用户名
+          dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
+          dst_token: ${{ secrets.GITEE_TOKEN }}
+          static_list: ${{env.REPO_NAME}}       # 替换为仓库名；如果同步多个，用逗号分隔
+          force_update: true                    # 强制覆盖更新
+          timeout: 600s                         # 超时时间
+          debug: ${{env.DEBUG}}                 # 启用调试日志（可选）
