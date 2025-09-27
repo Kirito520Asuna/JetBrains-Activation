@@ -11,7 +11,7 @@ on:
         description: '输入仓库名'
         required: false
         type: string
-        default: ${{ github.event.repository.name }}  # 默认使用 GitHub 仓库名
+        default: 'JetBrains-Activation'  # 默认使用 GitHub 仓库名
       gitee_name:
         description: '输入gitee用户名'
         required: false
@@ -35,7 +35,7 @@ jobs:
 
       - name: 1.设置输入值
         run: |
-          REPO_NAME=${{ inputs.repo_name ||github.event.repository.name}}
+          REPO_NAME=${{ inputs.repo_name ||github.event.repository.name||'JetBrains-Activation'}}
           DEBUG=${{ inputs.debug||true }}
           GITEE_NAME=${{ inputs.gitee_name||'kirito-asuna'}}
           GITHUB_NAME=${{inputs.github_name||'Kirito520Asuna'}}
